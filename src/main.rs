@@ -1,50 +1,15 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
-struct Person;
-
-#[derive(Component)]
-struct Name(String);
-
-#[derive(Resource)]
-struct GreetTimer(Timer);
-
-pub struct HelloPlugin;
-
-impl Plugin for HelloPlugin {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(GreetTimer(Timer::from_seconds(2.0, TimerMode::Repeating)));
-        app.add_systems(Startup, add_people);
-        app.add_systems(Update, (update_people, greet_people).chain());
-    }
-}
-
-fn add_people(mut commands: Commands) {
-    commands.spawn((Person, Name("Elina Protector".to_string())));
-    commands.spawn((Person, Name("Renzo Hume".to_string())));
-    commands.spawn((Person, Name("Zayna Nieves".to_string())));
-}
-
-fn update_people(mut query: Query<&mut Name, With<Person>>){
-    for mut name in &mut query{
-        if name.0 == "Elina Protector"{
-            name.0 = "Elina Hume".to_string();
-            break;
-        }
-    }
-}
-
-fn greet_people(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in &query {
-            println!("Hello {}!", name.0);
-        }
-    }
+fn setup(
+    mut commands: Commands,
+) {
+    commands.spawn(Camera2d::default());
 }
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(HelloPlugin)
+        .insert_resource(ClearColor(Color::srgb(0.1, 0.1, 0.1)))
+        .add_systems(Startup, setup)
         .run();
 }
